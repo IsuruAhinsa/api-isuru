@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +23,5 @@ Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::apiResource('category', CategoryController::class);
     Route::get('categories/list', [CategoryController::class, 'getCategoriesList']);
+    Route::apiResource('sub-category', SubCategoryController::class);
 });
