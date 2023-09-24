@@ -7,22 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
-class Category extends Model
+class Brand extends Model
 {
     use HasFactory;
 
-    public const IMAGE_UPLOAD_PATH = 'images/uploads/category/';
-    public const THUMB_IMAGE_UPLOAD_PATH = 'images/uploads/category_thumb/';
+    public const LOGO_UPLOAD_PATH = 'images/uploads/brand/';
+    public const THUMB_LOGO_UPLOAD_PATH = 'images/uploads/brand_thumb/';
 
     protected $fillable = [
         'user_id',
         'name',
         'slug',
-        'serial',
         'description',
-        'photo',
+        'logo',
         'status',
     ];
 
@@ -30,7 +28,7 @@ class Category extends Model
      * @param array $input
      * @return \Illuminate\Database\Eloquent\Builder|Model
      */
-    final public function storeCategory(array $input): Model|Builder
+    final public function storeBrand(array $input): Model|Builder
     {
         return self::query()->create($input);
     }
@@ -39,7 +37,7 @@ class Category extends Model
      * @param array $input
      * @return LengthAwarePaginator
      */
-    final public function getAllCategories(array $input): LengthAwarePaginator
+    final public function getAllBrands(array $input): LengthAwarePaginator
     {
         $query = self::query();
 
@@ -64,13 +62,5 @@ class Category extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return Collection
-     */
-    final public function getCategoryIdAndName(): Collection
-    {
-        return self::query()->select('name', 'id')->get();
     }
 }

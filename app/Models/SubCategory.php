@@ -35,11 +35,6 @@ class SubCategory extends Model
         return self::query()->create($input);
     }
 
-    public function updateSubCategory(array $input)
-    {
-        return self::query()->where('id', $input['id'])->update($input);
-    }
-
     /**
      * @param array $input
      * @return LengthAwarePaginator

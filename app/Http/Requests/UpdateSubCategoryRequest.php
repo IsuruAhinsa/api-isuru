@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSubCategoryRequest extends FormRequest
@@ -17,14 +18,14 @@ class UpdateSubCategoryRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
             'category' => 'required',
             'name' => 'required|min:3|max:50|string',
-            'slug' => 'required|min:3|max:50|string|unique:categories,slug,'.$this->id,
+            'slug' => 'required|min:3|max:50|string|unique:sub_categories,slug,' . $this->id,
             'description' => 'nullable|max:250|string',
             'serial' => 'required|numeric',
             'status' => 'required|boolean',
