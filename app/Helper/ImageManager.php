@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Helper;
 
 use Intervention\Image\Facades\Image;
 
-class ImageManager {
-
+class ImageManager
+{
     public const NO_IMAGE = 'images/no-img.png';
 
     /**
@@ -20,7 +21,7 @@ class ImageManager {
         $img_file_name = $name . ".webp";
         Image::make($file)
             ->fit($width, $height)
-            ->save(public_path($path).$img_file_name, 50, 'webp');
+            ->save(public_path($path) . $img_file_name, 50, 'webp');
         return $img_file_name;
     }
 
@@ -51,5 +52,35 @@ class ImageManager {
         }
 
         return $url;
+    }
+
+    /**
+     * @param string $file
+     * @param string $name
+     * @param string $img_upload_path
+     * @param string $thumb_img_upload_path
+     * @return string
+     */
+    final public static function imageUploadProcess(string $file, string $name, string $img_upload_path, string $thumb_img_upload_path): string
+    {
+        $photo_name = self::uploadImage($name, 800, 800, $img_upload_path, $file);
+
+        self::uploadImage($name, 150, 150, $thumb_img_upload_path, $file);
+
+        return $photo_name;
+    }
+
+    /**
+     * @param string $photo
+     * @param string $img_upload_path
+     * @param string $thumb_img_upload_path
+     * @return void
+     */
+    final public static function deleteImageWhenExist(string $photo, string $img_upload_path, string $thumb_img_upload_path): void
+    {
+        if (!empty($photo)) {
+            self::deleteImage($img_upload_path, $photo);
+            self::deleteImage($thumb_img_upload_path, $photo);
+        }
     }
 }

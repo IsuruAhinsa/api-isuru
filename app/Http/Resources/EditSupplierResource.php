@@ -7,7 +7,7 @@ use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SupplierResource extends JsonResource
+class EditSupplierResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,12 +22,16 @@ class SupplierResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'description' => $this->description,
-            'status' => $this->status === 1 ? 'Active' : 'InActive',
-            'logo' => ImageManager::prepareImageUrl(Supplier::THUMB_LOGO_UPLOAD_PATH, $this->logo),
+            'logo_preview' => ImageManager::prepareImageUrl(Supplier::THUMB_LOGO_UPLOAD_PATH, $this->logo),
             'created_by' => $this->user?->name,
             'created_at' => $this->created_at->toDayDateTimeString(),
             'updated_at' => $this->created_at != $this->updated_at ? $this->updated_at->toDayDateTimeString() : 'Not updated yet.',
-            'address' => new AddressResource($this->address),
+            'status' => $this->status,
+            'address' => $this->address?->address,
+            'province' => $this->address?->province_id,
+            'district' => $this->address?->district_id,
+            'city' => $this->address?->city_id,
+            'landmark' => $this->address?->landmark,
         ];
     }
 }

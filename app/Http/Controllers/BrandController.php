@@ -35,7 +35,12 @@ class BrandController extends Controller
         $brand['user_id'] = auth()->id();
 
         if ($request->has('logo')) {
-            $brand['logo'] = $this->imageUpload($request->input('logo'), $slug);
+            $brand['logo'] = ImageManager::imageUploadProcess(
+                $request->input('logo'),
+                $slug,
+                Brand::LOGO_UPLOAD_PATH,
+                Brand::THUMB_LOGO_UPLOAD_PATH
+            );;
         }
 
         (new Brand())->storeBrand($brand);
@@ -61,8 +66,18 @@ class BrandController extends Controller
         $record['slug'] = $slug = Str::slug($request->input('slug'));
 
         if ($request->has('logo')) {
-            $this->deleteImageWhenExist($brand->logo);
-            $record['logo'] = $this->imageUpload($request->input('logo'), $slug);
+            ImageManager::deleteImageWhenExist(
+                $brand->logo,
+                Brand::LOGO_UPLOAD_PATH,
+                Brand::THUMB_LOGO_UPLOAD_PATH
+            );
+
+            $record['logo'] = ImageManager::imageUploadProcess(
+                $request->input('logo'),
+                $slug,
+                Brand::LOGO_UPLOAD_PATH,
+                Brand::THUMB_LOGO_UPLOAD_PATH
+            );
         }
 
         $brand->update($record);
@@ -75,27 +90,14 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        $this->deleteImageWhenExist($brand->logo);
+        ImageManager::deleteImageWhenExist(
+            $brand->logo,
+            Brand::LOGO_UPLOAD_PATH,
+            Brand::THUMB_LOGO_UPLOAD_PATH
+        );
 
         $brand->delete();
 
         return response()->json(['msg' => 'Brand deleted successfully!']);
-    }
-
-    private function imageUpload($file, $slug)
-    {
-        $logo_name = ImageManager::uploadImage($slug, 800, 800, Brand::LOGO_UPLOAD_PATH, $file);
-
-        ImageManager::uploadImage($slug, 150, 150, Brand::THUMB_LOGO_UPLOAD_PATH, $file);
-
-        return $logo_name;
-    }
-
-    private function deleteImageWhenExist($logo)
-    {
-        if (!empty($logo)) {
-            ImageManager::deleteImage(Brand::LOGO_UPLOAD_PATH, $logo);
-            ImageManager::deleteImage(Brand::THUMB_LOGO_UPLOAD_PATH, $logo);
-        }
     }
 }

@@ -10,7 +10,7 @@ class LocationDataController extends Controller
     final public function getProvinces(): JsonResponse
     {
         $provinces = DB::table('provinces')
-            ->select(['id', 'name_en', 'name_si'])
+            ->select('id', 'name_en')
             ->get();
 
         return response()->json($provinces);
@@ -19,7 +19,7 @@ class LocationDataController extends Controller
     final public function getDistrictsByProvinceId(int $province_id)
     {
         $districts = DB::table('districts')
-            ->select(['id', 'name_en', 'name_si'])
+            ->select('id', 'name_en')
             ->where('province_id', $province_id)
             ->get();
 
@@ -29,7 +29,7 @@ class LocationDataController extends Controller
     final public function getCitiesByDistrictId(int $district_id)
     {
         $cities = DB::table('cities')
-            ->select(['id', 'name_en', 'name_si'])
+            ->select('id', 'name_en')
             ->where('district_id', $district_id)
             ->get();
 

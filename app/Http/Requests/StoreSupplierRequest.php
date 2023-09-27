@@ -23,17 +23,17 @@ class StoreSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'province' => 'required',
-            'district' => 'required',
-            'city' => 'required',
-            'company' => 'required|string|max:200',
-            'email' => 'required|string|unique:users,email',
-            'phone' => 'required|string|unique:users,phone',
+            'province' => 'required|numeric',
+            'district' => 'required|numeric',
+            'city' => 'required|numeric',
+            'company' => 'required|string|min:3|max:200',
+            'email' => 'required|string|unique:suppliers,email',
+            'phone' => 'required|string|unique:suppliers,phone',
             'description' => 'required|string',
             'logo' => 'required',
-            'status' => 'required|boolean',
-            'address' => 'required|string',
-            'landmark' => 'nullable|string',
+            'status' => 'required',
+            'address' => 'required|string|min:3|max:200',
+            'landmark' => 'nullable|string|max:200',
         ];
     }
 }

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helper\ImageManager;
+use App\Http\Resources\EditSupplierResource;
 use App\Http\Resources\SupplierResource;
+use App\Models\Address;
 use App\Models\Supplier;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
@@ -26,20 +29,37 @@ class SupplierController extends Controller
      */
     public function store(StoreSupplierRequest $request)
     {
-        $supplier = $request->except('logo');
-
-        $supplier['user_id'] =  auth()->id();
-        $supplier['province_id'] =  $request->input('province');
-        $supplier['district_id'] =  $request->input('district');
-        $supplier['city_id'] =  $request->input('city');
+        $supplier = (new Supplier())->prepareData($request->all(), auth());
+        $address = (new Address())->prepareData($request->all());
 
         if ($request->has('logo')) {
-            $supplier['logo'] = $this->imageUpload($request->input('logo'), date('Y_m_d_H_i_s'));
+            $supplier['logo'] = ImageManager::imageUploadProcess(
+                $request->input('logo'),
+                date('Y_m_d_H_i_s'),
+                Supplier::LOGO_UPLOAD_PATH,
+                Supplier::THUMB_LOGO_UPLOAD_PATH
+            );
         }
 
-        (new Supplier())->storeSupplier($supplier);
+        try {
+            DB::beginTransaction();
+            $supplier = Supplier::create($supplier);
+            $supplier->address()->create($address);
+            DB::commit();
+            return response()->json(['msg' => 'Supplier Updated Successfully!']);
+        } catch (\Throwable $throwable) {
+            if ($request->has('logo')) {
+                ImageManager::deleteImageWhenExist(
+                    $supplier->logo,
+                    Supplier::LOGO_UPLOAD_PATH,
+                    Supplier::THUMB_LOGO_UPLOAD_PATH
+                );
+            }
 
-        return response()->json(['msg' => 'Supplier Added Successfully!']);
+            info('SUPPLIER_STORE_FAILED', ['supplier' => $supplier, 'address' => $address, 'exception' => $throwable]);
+
+            DB::rollBack();
+        }
     }
 
     /**
@@ -47,7 +67,9 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        return new SupplierResource($supplier);
+        $supplier->load('address');
+
+        return new EditSupplierResource($supplier);
     }
 
     /**
@@ -55,20 +77,35 @@ class SupplierController extends Controller
      */
     public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
-        $record = $request->except('logo');
-
-        $record['province_id'] =  $request->input('province');
-        $record['district_id'] =  $request->input('district');
-        $record['city_id'] =  $request->input('city');
+        $supplier_record = (new Supplier())->prepareData($request->all(), auth());
+        $address_record = (new Address())->prepareData($request->all());
 
         if ($request->has('logo')) {
-            $this->deleteImageWhenExist($supplier->logo);
-            $record['logo'] = $this->imageUpload($request->input('logo'), date('Y_m_d_H_i_s'));
+
+            ImageManager::deleteImageWhenExist(
+                $supplier->logo,
+                Supplier::LOGO_UPLOAD_PATH,
+                Supplier::THUMB_LOGO_UPLOAD_PATH
+            );
+
+            $record['logo'] = ImageManager::imageUploadProcess(
+                $request->input('logo'),
+                date('Y_m_d_H_i_s'),
+                Supplier::LOGO_UPLOAD_PATH,
+                Supplier::THUMB_LOGO_UPLOAD_PATH
+            );
         }
 
-        $supplier->update($record);
-
-        return response()->json(['msg' => 'Supplier Updated Successfully!']);
+        try {
+            DB::beginTransaction();
+            $supplier_record = $supplier->update($supplier_record);
+            $supplier->address()->update($address_record);
+            DB::commit();
+            return response()->json(['msg' => 'Supplier Updated Successfully!']);
+        } catch (\Throwable $throwable) {
+            info('SUPPLIER_UPDATE_FAILED', ['supplier' => $supplier_record, 'address' => $address_record, 'exception' => $throwable]);
+            DB::rollBack();
+        }
     }
 
     /**
@@ -76,27 +113,16 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        $this->deleteImageWhenExist($supplier->logo);
+        ImageManager::deleteImageWhenExist(
+            $supplier->logo,
+            Supplier::LOGO_UPLOAD_PATH,
+            Supplier::THUMB_LOGO_UPLOAD_PATH
+        );
+
+        $supplier->address()->delete();
 
         $supplier->delete();
 
         return response()->json(['msg' => 'Supplier Deleted Successfully!']);
-    }
-
-    private function imageUpload($file, $slug)
-    {
-        $photo_name = ImageManager::uploadImage($slug, 800, 800, Supplier::LOGO_UPLOAD_PATH, $file);
-
-        ImageManager::uploadImage($slug, 150, 150, Supplier::THUMB_LOGO_UPLOAD_PATH, $file);
-
-        return $photo_name;
-    }
-
-    private function deleteImageWhenExist($logo)
-    {
-        if (!empty($logo)) {
-            ImageManager::deleteImage(Supplier::LOGO_UPLOAD_PATH, $logo);
-            ImageManager::deleteImage(Supplier::THUMB_LOGO_UPLOAD_PATH, $logo);
-        }
     }
 }

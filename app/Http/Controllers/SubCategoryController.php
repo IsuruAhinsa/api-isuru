@@ -37,7 +37,12 @@ class SubCategoryController extends Controller
         $sub_category['category_id'] = $request->input('category');
 
         if ($request->has('photo')) {
-            $sub_category['photo'] = $this->imageUpload($request->input('photo'), $slug);
+            $sub_category['photo'] = ImageManager::imageUploadProcess(
+                $request->input('photo'),
+                $slug,
+                SubCategory::IMAGE_UPLOAD_PATH,
+                SubCategory::THUMB_IMAGE_UPLOAD_PATH
+            );
         }
 
         (new SubCategory())->storeSubCategory($sub_category);
@@ -63,8 +68,18 @@ class SubCategoryController extends Controller
         $record['slug'] = $slug = Str::slug($request->input('slug'));
 
         if ($request->has('photo')) {
-            $this->deleteImageWhenExist($subCategory->photo);
-            $record['photo'] = $this->imageUpload($request->input('photo'), $slug);
+            ImageManager::deleteImageWhenExist(
+                $subCategory->photo,
+                SubCategory::IMAGE_UPLOAD_PATH,
+                SubCategory::THUMB_IMAGE_UPLOAD_PATH
+            );
+
+            $record['photo'] = ImageManager::imageUploadProcess(
+                $request->input('photo'),
+                $slug,
+                SubCategory::IMAGE_UPLOAD_PATH,
+                SubCategory::THUMB_IMAGE_UPLOAD_PATH
+            );
         }
 
         $subCategory->update($record);
@@ -77,27 +92,14 @@ class SubCategoryController extends Controller
      */
     public function destroy(SubCategory $subCategory)
     {
-        $this->deleteImageWhenExist($subCategory->photo);
+        ImageManager::deleteImageWhenExist(
+            $subCategory->photo,
+            SubCategory::IMAGE_UPLOAD_PATH,
+            SubCategory::THUMB_IMAGE_UPLOAD_PATH
+        );
 
         $subCategory->delete();
 
         return response()->json(['msg' => 'Category deleted successfully!']);
-    }
-
-    private function imageUpload($file, $slug)
-    {
-        $photo_name = ImageManager::uploadImage($slug, 800, 800, SubCategory::IMAGE_UPLOAD_PATH, $file);
-
-        ImageManager::uploadImage($slug, 150, 150, SubCategory::THUMB_IMAGE_UPLOAD_PATH, $file);
-
-        return $photo_name;
-    }
-
-    private function deleteImageWhenExist($photo)
-    {
-        if (!empty($photo)) {
-            ImageManager::deleteImage(SubCategory::IMAGE_UPLOAD_PATH, $photo);
-            ImageManager::deleteImage(SubCategory::THUMB_IMAGE_UPLOAD_PATH, $photo);
-        }
     }
 }

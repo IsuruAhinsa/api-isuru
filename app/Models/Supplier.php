@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class Supplier extends Model
@@ -17,26 +17,20 @@ class Supplier extends Model
 
     protected $fillable = [
         'user_id',
-        'province_id',
-        'district_id',
-        'city_id',
         'company',
         'email',
         'phone',
         'description',
         'logo',
         'status',
-        'address',
-        'landmark',
     ];
 
     /**
-     * @param array $input
-     * @return \Illuminate\Database\Eloquent\Builder|Model
+     * @return MorphOne
      */
-    final public function storeSupplier(array $input): Model|Builder
+    public function address(): MorphOne
     {
-        return self::query()->create($input);
+        return $this->morphOne(Address::class, 'addressable');
     }
 
     /**
@@ -45,12 +39,20 @@ class Supplier extends Model
      */
     final public function getAllSuppliers(array $input): LengthAwarePaginator
     {
-        $query = self::query();
+        $query = self::query()->with(
+            'address',
+            'address.province:id,name_en,name_si',
+            'address.district:id,name_en,name_si',
+            'address.city:id,name_en,name_si',
+            'user:id,name',
+        );
 
         $per_page = $input['per_page'] ?? 5;
 
         if (!empty($input['search'])) {
-            $query->where('name', 'like', '%'.$input['search'].'%');
+            $query->where('company', 'like', '%' . $input['search'] . '%')
+                ->orWhere('phone', 'like', '%' . $input['search'] . '%')
+                ->orWhere('email', 'like', '%' . $input['search'] . '%');
         }
 
         if (!empty($input['order_by'])) {
@@ -58,7 +60,6 @@ class Supplier extends Model
         }
 
         return $query
-            ->with('user:id,name')
             ->paginate($per_page);
     }
 
@@ -71,26 +72,19 @@ class Supplier extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @param array $input
+     * @param $auth
+     * @return array
      */
-    public function province(): BelongsTo
+    final public function prepareData(array $input, $auth): array
     {
-        return $this->belongsTo(Province::class);
-    }
+        $supplier['description'] = $input['description'] ?? null;
+        $supplier['user_id'] = $auth->id();
+        $supplier['company'] = $input['company'] ?? null;
+        $supplier['email'] = $input['email'] ?? null;
+        $supplier['phone'] = $input['phone'] ?? null;
+        $supplier['status'] = $input['status'] ?? null;
 
-    /**
-     * @return BelongsTo
-     */
-    public function district(): BelongsTo
-    {
-        return $this->belongsTo(District::class);
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function city(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
+        return $supplier;
     }
 }

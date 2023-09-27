@@ -36,7 +36,12 @@ class CategoryController extends Controller
         $category['user_id'] = auth()->id();
 
         if ($request->has('photo')) {
-            $category['photo'] = $this->imageUpload($request->input('photo'), $slug);
+            $category['photo'] = ImageManager::imageUploadProcess(
+                $request->input('photo'),
+                $slug,
+                Category::IMAGE_UPLOAD_PATH,
+                Category::THUMB_IMAGE_UPLOAD_PATH
+            );
         }
 
         (new Category())->storeCategory($category);
@@ -62,8 +67,20 @@ class CategoryController extends Controller
         $record['slug'] = $slug = Str::slug($request->input('slug'));
 
         if ($request->has('photo')) {
-            $this->deleteImageWhenExist($category->photo);
-            $record['photo'] = $this->imageUpload($request->input('photo'), $slug);
+
+            ImageManager::deleteImageWhenExist(
+                $category->photo,
+                Category::IMAGE_UPLOAD_PATH,
+                Category::THUMB_IMAGE_UPLOAD_PATH
+            );
+
+            $record['photo'] = ImageManager::imageUploadProcess(
+                $request->input('photo'),
+                $slug,
+                Category::IMAGE_UPLOAD_PATH,
+                Category::THUMB_IMAGE_UPLOAD_PATH
+            );
+
         }
 
         $category->update($record);
@@ -76,28 +93,15 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $this->deleteImageWhenExist($category->photo);
+        ImageManager::deleteImageWhenExist(
+            $category->photo,
+            Category::IMAGE_UPLOAD_PATH,
+            Category::THUMB_IMAGE_UPLOAD_PATH
+        );
 
         $category->delete();
 
         return response()->json(['msg' => 'Category deleted successfully!']);
-    }
-
-    private function imageUpload($file, $slug)
-    {
-        $photo_name = ImageManager::uploadImage($slug, 800, 800, Category::IMAGE_UPLOAD_PATH, $file);
-
-        ImageManager::uploadImage($slug, 150, 150, Category::THUMB_IMAGE_UPLOAD_PATH, $file);
-
-        return $photo_name;
-    }
-
-    private function deleteImageWhenExist($photo)
-    {
-        if (!empty($photo)) {
-            ImageManager::deleteImage(Category::IMAGE_UPLOAD_PATH, $photo);
-            ImageManager::deleteImage(Category::THUMB_IMAGE_UPLOAD_PATH, $photo);
-        }
     }
 
     /**
