@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationDataController;
 use App\Http\Controllers\ProductAttributeController;
+use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Http\Request;
@@ -34,4 +35,5 @@ Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::get('cities/{district_id}', [LocationDataController::class, 'getCitiesByDistrictId']);
     Route::apiResource('supplier', SupplierController::class)->except(['create', 'edit']);
     Route::apiResource('product-attribute', ProductAttributeController::class)->except(['create', 'show', 'edit']);
+    Route::apiResource('product-attribute.values', ProductAttributeValueController::class)->except(['index', 'create', 'show', 'edit', 'update']);
 });

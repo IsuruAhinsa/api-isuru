@@ -17,6 +17,7 @@ class ProductAttributeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'values' => $this->values,
             'status' => $this->status === 1 ? 'Active' : 'InActive',
             'created_by' => $this->user?->name,
             'created_at' => $this->created_at->toDayDateTimeString(),
