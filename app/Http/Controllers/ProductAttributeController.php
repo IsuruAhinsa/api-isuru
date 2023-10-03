@@ -6,6 +6,7 @@ use App\Http\Resources\ProductAttributeResource;
 use App\Models\ProductAttribute;
 use App\Http\Requests\StoreProductAttributeRequest;
 use App\Http\Requests\UpdateProductAttributeRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductAttributeController extends Controller
@@ -48,5 +49,14 @@ class ProductAttributeController extends Controller
     {
         $productAttribute->delete();
         return response()->json(['msg' => 'Product Attribute Deleted!']);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    final public function getAttributeListWithValues(): JsonResponse
+    {
+        $attributes = (new ProductAttribute())->getAttributeIdAndNameWithValues();
+        return response()->json($attributes);
     }
 }

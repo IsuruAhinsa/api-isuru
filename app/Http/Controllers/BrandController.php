@@ -8,6 +8,7 @@ use App\Http\Resources\EditBrandResource;
 use App\Models\Brand;
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -99,5 +100,14 @@ class BrandController extends Controller
         $brand->delete();
 
         return response()->json(['msg' => 'Brand deleted successfully!']);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    final public function getBrandsList(): JsonResponse
+    {
+        $brands = (new Brand())->getBrandIdAndName();
+        return response()->json($brands);
     }
 }

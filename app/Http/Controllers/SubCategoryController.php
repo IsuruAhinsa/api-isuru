@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Helper\ImageManager;
 use App\Http\Resources\EditSubCategoryResource;
 use App\Http\Resources\SubCategoryResource;
+use App\Models\Category;
 use App\Models\SubCategory;
 use App\Http\Requests\StoreSubCategoryRequest;
 use App\Http\Requests\UpdateSubCategoryRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -67,6 +69,8 @@ class SubCategoryController extends Controller
 
         $record['slug'] = $slug = Str::slug($request->input('slug'));
 
+        $record['category_id'] = $request->input('category');
+
         if ($request->has('photo')) {
             ImageManager::deleteImageWhenExist(
                 $subCategory->photo,
@@ -101,5 +105,16 @@ class SubCategoryController extends Controller
         $subCategory->delete();
 
         return response()->json(['msg' => 'Category deleted successfully!']);
+    }
+
+    /**
+     * @param Category $category
+     * @return JsonResponse
+     */
+    final public function getSubCategoriesList(Category $category): JsonResponse
+    {
+        $sub_categories = (new SubCategory())->getSubCategoryIdAndName($category->id);
+
+        return response()->json($sub_categories);
     }
 }

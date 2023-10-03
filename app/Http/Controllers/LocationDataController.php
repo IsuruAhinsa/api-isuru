@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class LocationDataController extends Controller
 {
@@ -34,5 +36,26 @@ class LocationDataController extends Controller
             ->get();
 
         return response()->json($cities);
+    }
+
+    public function storeCountries()
+    {
+        $url = 'https://restcountries.com/v3.1/all';
+        $response = Http::get($url);
+        $response = json_decode($response, true);
+
+        foreach ($response as $country) {
+            $data['name'] = $country['name']['common'];
+            Country::create($data);
+        }
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    final public function getCountriesList(): JsonResponse
+    {
+        $countries = (new Country())->getCountryIdAndName();
+        return response()->json($countries);
     }
 }

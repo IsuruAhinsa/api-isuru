@@ -9,6 +9,7 @@ use App\Models\Address;
 use App\Models\Supplier;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -124,5 +125,14 @@ class SupplierController extends Controller
         $supplier->delete();
 
         return response()->json(['msg' => 'Supplier Deleted Successfully!']);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    final public function getSuppliersList(): JsonResponse
+    {
+        $suppliers = (new Supplier())->getSupplierSelectList();
+        return response()->json($suppliers);
     }
 }

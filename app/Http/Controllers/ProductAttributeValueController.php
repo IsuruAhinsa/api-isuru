@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreValueRequest;
 use App\Models\ProductAttribute;
 use App\Models\Value;
+use Illuminate\Http\JsonResponse;
 
 class ProductAttributeValueController extends Controller
 {
@@ -34,5 +35,15 @@ class ProductAttributeValueController extends Controller
         $value->delete();
 
         return response()->json(['msg' => 'Product Attribute Value Deleted!']);
+    }
+
+    /**
+     * @param ProductAttribute $productAttribute
+     * @return JsonResponse
+     */
+    final public function getProductAttributeValuesList(ProductAttribute $productAttribute): JsonResponse
+    {
+        $values = (new Value())->getProductAttributeIdAndName($productAttribute);
+        return response()->json($values);
     }
 }

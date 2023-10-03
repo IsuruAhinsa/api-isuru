@@ -15,6 +15,8 @@ class Category extends Model
 
     public const IMAGE_UPLOAD_PATH = 'images/uploads/category/';
     public const THUMB_IMAGE_UPLOAD_PATH = 'images/uploads/category_thumb/';
+    const STATUS_ACTIVE = TRUE;
+    const STATUS_INACTIVE = FALSE;
 
     protected $fillable = [
         'user_id',
@@ -71,6 +73,9 @@ class Category extends Model
      */
     final public function getCategoryIdAndName(): Collection
     {
-        return self::query()->select('name', 'id')->get();
+        return self::query()
+            ->where('status', self::STATUS_ACTIVE)
+            ->select('name', 'id')
+            ->get();
     }
 }

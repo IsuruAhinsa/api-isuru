@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,8 @@ class SubCategory extends Model
 
     public const IMAGE_UPLOAD_PATH = 'images/uploads/sub_category/';
     public const THUMB_IMAGE_UPLOAD_PATH = 'images/uploads/sub_category_thumb/';
+    const STATUS_ACTIVE = TRUE;
+    const STATUS_INACTIVE = FALSE;
 
     protected $fillable = [
         'user_id',
@@ -72,5 +75,18 @@ class SubCategory extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @param $categoryId
+     * @return Collection|array
+     */
+    public function getSubCategoryIdAndName($categoryId): Collection|array
+    {
+        return self::query()
+            ->where('category_id', $categoryId)
+            ->where('status', self::STATUS_ACTIVE)
+            ->select('id', 'name')
+            ->get();
     }
 }

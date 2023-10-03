@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ProductAttribute extends Model
 {
     use HasFactory;
+
+    const STATUS_ACTIVE = TRUE;
+    const STATUS_INACTIVE = FALSE;
 
     protected $fillable = [
         'user_id', 'name', 'status'
@@ -53,5 +57,17 @@ class ProductAttribute extends Model
     public function values(): HasMany
     {
         return $this->hasMany(Value::class);
+    }
+
+    /**
+     * @return Collection|array
+     */
+    final public function getAttributeIdAndNameWithValues(): Collection|array
+    {
+        return self::query()
+            ->select('id', 'name')
+            ->with('values:id,name,product_attribute_id')
+            ->where('status', self::STATUS_ACTIVE)
+            ->get();
     }
 }

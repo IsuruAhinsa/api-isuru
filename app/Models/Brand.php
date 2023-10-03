@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,8 @@ class Brand extends Model
 
     public const LOGO_UPLOAD_PATH = 'images/uploads/brand/';
     public const THUMB_LOGO_UPLOAD_PATH = 'images/uploads/brand_thumb/';
+    const STATUS_ACTIVE = TRUE;
+    const STATUS_INACTIVE = FALSE;
 
     protected $fillable = [
         'user_id',
@@ -62,5 +65,16 @@ class Brand extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return Collection|array
+     */
+    final public function getBrandIdAndName(): Collection|array
+    {
+        return self::query()
+            ->where('status', self::STATUS_ACTIVE)
+            ->select('id', 'name')
+            ->get();
     }
 }
