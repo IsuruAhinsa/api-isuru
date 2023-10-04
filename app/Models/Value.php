@@ -11,24 +11,24 @@ class Value extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_attribute_id', 'name'];
+    protected $fillable = ['user_id', 'attribute_id', 'name'];
 
     /**
      * @return BelongsTo
      */
-    public function productAttribute(): BelongsTo
+    public function attribute(): BelongsTo
     {
-        return $this->belongsTo(ProductAttribute::class);
+        return $this->belongsTo(Attribute::class);
     }
 
     /**
-     * @param $productAttribute
+     * @param $attribute
      * @return Collection|array
      */
-    final public function getProductAttributeIdAndName($productAttribute): Collection|array
+    final public function getAttributeIdAndName($attribute): Collection|array
     {
         return self::query()
-            ->where('product_attribute_id', $productAttribute->id)
+            ->where('attribute_id', $attribute->id)
             ->select('id', 'name')
             ->get();
     }

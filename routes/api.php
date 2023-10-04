@@ -1,14 +1,14 @@
 <?php
 
+use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationDataController;
-use App\Http\Controllers\ProductAttributeController;
 use App\Http\Controllers\ProductAttributeValueController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,7 +46,9 @@ Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::apiResource('supplier', SupplierController::class)->except(['create', 'edit']);
     Route::get('get-suppliers-list', [SupplierController::class, 'getSuppliersList']);
 
-    Route::apiResource('product-attribute', ProductAttributeController::class)->except(['create', 'show', 'edit']);
-    Route::get('get-product-attribute-list', [ProductAttributeController::class, 'getAttributeListWithValues']);
-    Route::apiResource('product-attribute.values', ProductAttributeValueController::class)->except(['index', 'create', 'show', 'edit', 'update']);
+    Route::apiResource('attribute', AttributeController::class)->except(['create', 'show', 'edit']);
+    Route::get('get-attribute-list', [AttributeController::class, 'getAttributeListWithValues']);
+    Route::apiResource('attribute.values', ProductAttributeValueController::class)->except(['index', 'create', 'show', 'edit', 'update']);
+
+    Route::apiResource('products', ProductController::class)->except(['create', 'edit']);
 });

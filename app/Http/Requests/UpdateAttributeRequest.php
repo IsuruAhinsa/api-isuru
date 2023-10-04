@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSubCategoryRequest extends FormRequest
+class UpdateAttributeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,8 @@ class StoreSubCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required',
-            'name' => 'required|min:3|max:50|string',
-            'slug' => 'required|min:3|max:50|string|unique:sub_categories',
-            'description' => 'nullable|max:250|string',
-            'serial' => 'required|numeric|unique:sub_categories,serial',
-            'status' => 'required|boolean',
+            'name' => 'required|string|min:2|max:50|unique:attributes,name,' . $this->id,
+            'status' => 'required',
         ];
     }
 }

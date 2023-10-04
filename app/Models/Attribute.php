@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProductAttribute extends Model
+class Attribute extends Model
 {
     use HasFactory;
 
@@ -66,7 +66,7 @@ class ProductAttribute extends Model
     {
         return self::query()
             ->select('id', 'name')
-            ->with('values:id,name,product_attribute_id')
+            ->with('values:id,name,attribute_id')
             ->where('status', self::STATUS_ACTIVE)
             ->get();
     }
