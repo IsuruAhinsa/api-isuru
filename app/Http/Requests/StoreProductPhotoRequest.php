@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProductAttributeRequest extends FormRequest
+class StoreProductPhotoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class UpdateProductAttributeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:2|max:50|unique:product_attributes,name,' . $this->id,
-            'status' => 'required',
+            //
         ];
     }
 }
