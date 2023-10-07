@@ -7,6 +7,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LocationDataController;
 use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductPhotoController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 
-Route::get('/get-countries', [LocationDataController::class, 'storeCountries']);
+Route::get('/store-countries', [LocationDataController::class, 'storeCountries']);
 
 Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -51,4 +53,8 @@ Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::apiResource('attribute.values', ProductAttributeValueController::class)->except(['index', 'create', 'show', 'edit', 'update']);
 
     Route::apiResource('products', ProductController::class)->except(['create', 'edit']);
+    Route::apiResource('products.photos', ProductPhotoController::class)->except(['create', 'edit']);
+
+    Route::apiResource('shop', ShopController::class)->except(['create', 'edit']);
+    Route::get('get-shops-list', [ShopController::class, 'getShopsList']);
 });
