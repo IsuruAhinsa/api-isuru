@@ -30,6 +30,7 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'cost' => PriceManager::CURRENCY_SYMBOL . $this->cost,
             'price' => PriceManager::CURRENCY_SYMBOL . $this->price,
+            'sale_price' => PriceManager::calculate_sell_price($this->price, $this->discount, $this->discount_fixed, $this->discount_start, $this->discount_end),
             'stock' => $this->stock,
             'discount_percentage' => $this->discount . '%',
             'discount_fixed' => PriceManager::CURRENCY_SYMBOL . $this->discount_fixed,
