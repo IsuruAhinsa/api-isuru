@@ -8,6 +8,7 @@ use App\Http\Controllers\LocationDataController;
 use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPhotoController;
+use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SupplierController;
@@ -28,7 +29,7 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::get('/store-countries', [LocationDataController::class, 'storeCountries']);
 
-Route::group(['middleware' => 'auth:sanctum'], static function () {
+Route::group(['middleware' => ['auth:sanctum', 'auth:admin']], static function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
     Route::apiResource('category', CategoryController::class)->except(['create', 'edit']);
@@ -57,4 +58,10 @@ Route::group(['middleware' => 'auth:sanctum'], static function () {
 
     Route::apiResource('shop', ShopController::class)->except(['create', 'edit']);
     Route::get('get-shops-list', [ShopController::class, 'getShopsList']);
+
+    Route::apiResource('sales-managers', SalesManagerController::class)->except(['create', 'edit']);
+});
+
+Route::group(['middleware' => 'auth:admin,sales_manager'], function () {
+    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 });

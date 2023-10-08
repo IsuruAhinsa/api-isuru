@@ -76,13 +76,12 @@ class Supplier extends Model
 
     /**
      * @param array $input
-     * @param $auth
      * @return array
      */
-    final public function prepareData(array $input, $auth): array
+    final public function prepareData(array $input): array
     {
         $supplier['description'] = $input['description'] ?? null;
-        $supplier['user_id'] = $auth->id();
+        $supplier['user_id'] = auth()->id();
         $supplier['company'] = $input['company'] ?? null;
         $supplier['email'] = $input['email'] ?? null;
         $supplier['phone'] = $input['phone'] ?? null;

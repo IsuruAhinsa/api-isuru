@@ -30,7 +30,7 @@ class SupplierController extends Controller
      */
     public function store(StoreSupplierRequest $request)
     {
-        $supplier = (new Supplier())->prepareData($request->all(), auth());
+        $supplier = (new Supplier())->prepareData($request->all());
         $address = (new Address())->prepareData($request->all());
 
         if ($request->has('logo')) {
@@ -47,7 +47,7 @@ class SupplierController extends Controller
             $supplier = Supplier::create($supplier);
             $supplier->address()->create($address);
             DB::commit();
-            return response()->json(['msg' => 'Supplier Updated Successfully!']);
+            return response()->json(['msg' => 'Supplier Added Successfully!']);
         } catch (\Throwable $throwable) {
             if ($request->has('logo')) {
                 ImageManager::deleteImageWhenExist(
@@ -78,7 +78,7 @@ class SupplierController extends Controller
      */
     public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
-        $supplier_record = (new Supplier())->prepareData($request->all(), auth());
+        $supplier_record = (new Supplier())->prepareData($request->all());
         $address_record = (new Address())->prepareData($request->all());
 
         if ($request->has('logo')) {
@@ -89,7 +89,7 @@ class SupplierController extends Controller
                 Supplier::THUMB_LOGO_UPLOAD_PATH
             );
 
-            $record['logo'] = ImageManager::imageUploadProcess(
+            $supplier_record['logo'] = ImageManager::imageUploadProcess(
                 $request->input('logo'),
                 date('Y_m_d_H_i_s'),
                 Supplier::LOGO_UPLOAD_PATH,
