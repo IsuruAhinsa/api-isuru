@@ -99,12 +99,11 @@ class Product extends Model
 
         if (!empty($input['search'])) {
             $query->where('name', 'like', '%' . $input['search'] . '%')
-                ->orWhere('price', 'like', '%' . $input['search'] . '%')
                 ->orWhere('sku', 'like', '%' . $input['search'] . '%');
         }
 
         if (!empty($input['order_by'])) {
-            $query->orderBy($input['order_by'], $input['direction'] ?? 'asc');
+            $query->orderBy($input['order_by'], $input['direction']);
         }
 
         return $query

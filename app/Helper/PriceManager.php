@@ -33,7 +33,7 @@ class PriceManager
             }
         }
 
-        return ['price' => number_format($price - $discount, 2), 'discount' => number_format($discount, 2), 'symbol' => self::CURRENCY_SYMBOL];
+        return ['price' => $price - $discount, 'discount' => $discount, 'symbol' => self::CURRENCY_SYMBOL];
     }
 
     /**
@@ -56,6 +56,6 @@ class PriceManager
             $discount += $discount_fixed;
         }
 
-        return ['price' => number_format($price - $discount, 2), 'discount' => number_format($discount, 2), 'symbol' => self::CURRENCY_SYMBOL];
+        return ['price' => $price - $discount, 'discount' => $discount, 'symbol' => self::CURRENCY_SYMBOL];
     }
 }
