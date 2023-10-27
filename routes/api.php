@@ -4,6 +4,7 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LocationDataController;
 use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\ProductController;
@@ -60,6 +61,8 @@ Route::group(['middleware' => ['auth:sanctum', 'auth:admin']], static function (
     Route::get('get-shops-list', [ShopController::class, 'getShopsList']);
 
     Route::apiResource('sales-managers', SalesManagerController::class)->except(['create', 'edit']);
+
+    Route::apiResource('customers', CustomerController::class)->except(['create', 'edit']);
 });
 
 Route::group(['middleware' => 'auth:admin,sales_manager'], function () {
