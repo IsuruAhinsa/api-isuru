@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -100,5 +101,19 @@ class Shop extends Model
             ->where('status', self::STATUS_ACTIVE)
             ->select('id', 'company')
             ->get();
+    }
+
+    /**
+     * @param $id
+     * @return Model|Collection|Builder|array|null
+     */
+    final public function getShopDetailsById($id): Model|Collection|Builder|array|null
+    {
+        return self::query()
+            ->with('address',
+                'address.province:id,name_en,name_si',
+                'address.district:id,name_en,name_si',
+                'address.city:id,name_en,name_si')
+            ->findOrFail($id);
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthRequest;
+use App\Http\Resources\ShopResource;
 use App\Models\SalesManager;
+use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,12 +33,17 @@ class AuthController extends Controller
         }
 
         if ($user && Hash::check($request->input('password'), $user->password)) {
+            $branch = null;
+            if ($role == self::USER_SALES_MANAGER) {
+                $branch = (new Shop())->getShopDetailsById($user->shop_id);
+            }
             $user_data['token'] = $user->createToken($user->email)->plainTextToken;
             $user_data['name'] = $user->name;
             $user_data['email'] = $user->email;
             $user_data['phone'] = $user->phone;
             $user_data['photo'] = $user->photo;
             $user_data['role'] = $role;
+            $user_data['branch'] = $branch ? new ShopResource($branch) : null;
 
             return response()->json($user_data);
         }
