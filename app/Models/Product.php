@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -181,5 +182,14 @@ class Product extends Model
     public function product_attributes(): HasMany
     {
         return $this->hasMany(ProductAttribute::class);
+    }
+
+    /**
+     * @param int $id
+     * @return Model|Collection|Builder|array|null
+     */
+    public function getProductById(int $id): Model|Collection|Builder|array|null
+    {
+        return self::query()->with('primary_photo')->findOrFail($id);
     }
 }

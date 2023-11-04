@@ -6,6 +6,8 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LocationDataController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPhotoController;
@@ -61,10 +63,11 @@ Route::group(['middleware' => ['auth:sanctum', 'auth:admin']], static function (
     Route::get('get-shops-list', [ShopController::class, 'getShopsList']);
 
     Route::apiResource('sales-managers', SalesManagerController::class)->except(['create', 'edit']);
-
-    Route::apiResource('customers', CustomerController::class)->except(['create', 'edit']);
 });
 
 Route::group(['middleware' => 'auth:admin,sales_manager'], function () {
     Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+    Route::apiResource('customers', CustomerController::class)->except(['create', 'edit']);
+    Route::apiResource('orders', OrderController::class)->except(['create', 'edit']);
+    Route::get('get-payment-methods', [PaymentMethodController::class, 'index']);
 });
