@@ -27,6 +27,8 @@ class SalesManager extends Model
         'user_id', 'shop_id', 'name', 'email', 'phone', 'status', 'password', 'nic', 'photo', 'nic_photo', 'bio',
     ];
 
+    protected $hidden = ['password'];
+
     /**
      * @return MorphOne
      */
@@ -110,5 +112,13 @@ class SalesManager extends Model
         return self::query()->where('email', $input['email'])
             ->orWhere('phone', $input['email'])
             ->first();
+    }
+
+    /**
+     * @return MorphOne
+     */
+    public function transaction(): MorphOne
+    {
+        return $this->morphOne(Transaction::class, 'transactionable');
     }
 }

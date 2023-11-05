@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderDetailsResource;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $orders = (new Order())->getAllOrders($request->all());
+        return OrderResource::collection($orders);
     }
 
     /**
@@ -21,8 +26,16 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
-        // order, customer, order_product
-        $order = (new Order())->placeOrder($request->all());
+        try {
+            DB::beginTransaction();
+            (new Order())->placeOrder($request->all());
+            DB::commit();
+            return response()->json(['msg' => 'Order Placed Successfully!', 'flag' => TRUE]);
+        } catch (\Throwable $throwable) {
+            info('ORDER_PLACED_FAILED', ['message' => $throwable->getMessage(), $throwable]);
+            DB::rollBack();
+            return response()->json(['msg' => $throwable->getMessage()]);
+        }
     }
 
     /**
@@ -30,7 +43,18 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        $order->load([
+            'customer',
+            'payment_method:id,name',
+            'sales_manager:id,name',
+            'shop',
+            'order_details',
+            'transactions',
+            'transactions.customer',
+            'transactions.payment_method',
+            'transactions.transactionable',
+        ]);
+        return new OrderDetailsResource($order);
     }
 
     /**

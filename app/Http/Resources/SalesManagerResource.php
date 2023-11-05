@@ -27,8 +27,8 @@ class SalesManagerResource extends JsonResource
             'status' => $this->status === 1 ? 'Active' : 'InActive',
             'photo' => ImageManager::prepareImageUrl(SalesManager::THUMB_IMAGE_UPLOAD_PATH, $this->photo),
             'nic_photo' => ImageManager::prepareImageUrl(SalesManager::NIC_THUMB_IMAGE_UPLOAD_PATH, $this->nic_photo),
-            'created_at' => $this->created_at->toDayDateTimeString(),
-            'updated_at' => $this->created_at != $this->updated_at ? $this->updated_at->toDayDateTimeString() : 'Not updated yet.',
+            'created_at' => $this->created_at && $this->created_at->toDayDateTimeString(),
+            'updated_at' => $this->created_at && $this->created_at != $this->updated_at ? $this->updated_at->toDayDateTimeString() : 'Not updated yet.',
             'address' => new AddressResource($this->address),
             'shop' => new ShopResource($this->shop),
         ];

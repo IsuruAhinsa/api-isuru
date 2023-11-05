@@ -2,6 +2,7 @@
 
 namespace App\Helper;
 
+use App\Models\Order;
 use App\Models\Product;
 use Carbon\Carbon;
 use Exception;
@@ -75,18 +76,12 @@ class OrderManager
      */
     public static function decidePaymentStatus(float $amount, float $paid_amount): int
     {
-        /*
-         * 1 = Paid
-         * 2 = Partially Paid
-         * 3 = Unpaid
-         */
-
         if ($amount <= $paid_amount) {
-            $payment_status = 1;
+            $payment_status = Order::PAYMENT_STATUS_PAID;
         } elseif ($paid_amount <= 0) {
-            $payment_status = 3;
+            $payment_status = Order::PAYMENT_STATUS_UNPAID;
         } else {
-            $payment_status = 2;
+            $payment_status = Order::PAYMENT_STATUS_PARTIALLY_PAID;
         }
 
         return $payment_status;

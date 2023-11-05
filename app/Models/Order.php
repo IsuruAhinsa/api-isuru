@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Helper\OrderManager;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -17,6 +20,9 @@ class Order extends Model
     public const STATUS_PENDING = 1;
     public const STATUS_PROCESSED = 2;
     public const STATUS_COMPLETED = 3;
+    public const PAYMENT_STATUS_PAID = 1;
+    public const PAYMENT_STATUS_PARTIALLY_PAID = 2;
+    public const PAYMENT_STATUS_UNPAID = 3;
 
     public const SHIPMENT_STATUS_COMPLETED = 1;
 
@@ -34,6 +40,7 @@ class Order extends Model
         }
         $order = self::query()->create($order_data['order_data']);
         (new OrderDetail())->storeOrderDetails($order_data['order_details_data'], $order);
+        (new Transaction())->storeTransaction($input, $order);
     }
 
     /**
@@ -67,5 +74,68 @@ class Order extends Model
 
             return ['order_data' => $order, 'order_details_data' => $order_data['order_details']];
         }
+    }
+
+    final public function getAllOrders(array $input): LengthAwarePaginator
+    {
+        $is_admin = Auth::guard('admin')->check();
+
+        $query = self::query()->with(['customer:id,name,phone', 'payment_method:id,name', 'sales_manager:id,name,phone', 'shop:id,company']);
+
+        if (!$is_admin) {
+            $query->where('shop_id', auth()->user()->shop_id);
+        }
+
+        $per_page = $input['per_page'] ?? 5;
+
+        return $query->paginate($per_page);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function payment_method(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function sales_manager(): BelongsTo
+    {
+        return $this->belongsTo(SalesManager::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function shop(): BelongsTo
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function order_details(): HasMany
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

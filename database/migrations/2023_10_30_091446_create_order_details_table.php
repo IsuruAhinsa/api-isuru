@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('discount')->nullable();
             $table->integer('discount_fixed')->nullable();
             $table->double('price');
+            $table->double('sale_price');
             $table->timestamp('discount_start')->nullable();
             $table->timestamp('discount_end')->nullable();
             $table->timestamps();
