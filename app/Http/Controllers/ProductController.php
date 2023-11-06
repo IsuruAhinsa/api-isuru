@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductBarcodeResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
@@ -76,5 +77,11 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+
+    public function getProductListForBarcode(Request $request)
+    {
+        $products = (new Product())->getProductsForBarcode($request->all());
+        return ProductBarcodeResource::collection($products);
     }
 }

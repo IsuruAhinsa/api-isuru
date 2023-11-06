@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProductAttributeValueController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductPhotoController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubCategoryController;
@@ -36,10 +37,8 @@ Route::group(['middleware' => ['auth:sanctum', 'auth:admin']], static function (
     Route::post('logout', [AuthController::class, 'logout']);
 
     Route::apiResource('category', CategoryController::class)->except(['create', 'edit']);
-    Route::get('get-categories-list', [CategoryController::class, 'getCategoriesList']);
 
     Route::apiResource('sub-category', SubCategoryController::class)->except(['create', 'edit']);
-    Route::get('get-sub-categories-list/{category}', [SubCategoryController::class, 'getSubCategoriesList']);
 
     Route::apiResource('brand', BrandController::class)->except(['create', 'edit']);
     Route::get('get-brands-list', [BrandController::class, 'getBrandsList']);
@@ -66,8 +65,12 @@ Route::group(['middleware' => ['auth:sanctum', 'auth:admin']], static function (
 });
 
 Route::group(['middleware' => 'auth:admin,sales_manager'], function () {
+    Route::get('get-categories-list', [CategoryController::class, 'getCategoriesList']);
+    Route::get('get-sub-categories-list/{category}', [SubCategoryController::class, 'getSubCategoriesList']);
     Route::apiResource('products', ProductController::class)->only(['index', 'show']);
     Route::apiResource('customers', CustomerController::class)->except(['create', 'edit']);
     Route::apiResource('orders', OrderController::class)->except(['create', 'edit']);
     Route::get('get-payment-methods', [PaymentMethodController::class, 'index']);
+    Route::get('get-product-list-for-barcode', [ProductController::class, 'getProductListForBarcode']);
+    Route::get('get-reports', [ReportController::class, 'index']);
 });

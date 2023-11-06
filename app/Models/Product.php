@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -191,5 +192,34 @@ class Product extends Model
     public function getProductById(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->with('primary_photo')->findOrFail($id);
+    }
+
+    public function getProductsForBarcode(array $input)
+    {
+        $query = self::query()->select('id', 'name', 'sku', 'price', 'discount', 'discount_fixed', 'discount_end', 'discount_start');
+
+        if (isset($input['name'])) {
+            $query->where('name', 'like', '%'.$input['name'].'%');
+        }
+
+        if (isset($input['category_id'])) {
+            $query->where('category_id', $input['category_id']);
+        }
+
+        if (isset($input['sub_category_id'])) {
+            $query->where('sub_category_id', $input['sub_category_id']);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * @param array $columns
+     * @return \Illuminate\Support\Collection
+     */
+    public function getProducts(array $columns = ['*']): \Illuminate\Support\Collection
+    {
+        $products = DB::table('products')->select($columns)->get();
+        return collect($products);
     }
 }
