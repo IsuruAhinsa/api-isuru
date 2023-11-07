@@ -222,4 +222,13 @@ class Product extends Model
         $products = DB::table('products')->select($columns)->get();
         return collect($products);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function photos(): HasMany
+    {
+        return $this->hasMany(ProductPhoto::class)
+            ->where('is_primary', 0);
+    }
 }

@@ -72,5 +72,6 @@ Route::group(['middleware' => 'auth:admin,sales_manager'], function () {
     Route::apiResource('orders', OrderController::class)->except(['create', 'edit']);
     Route::get('get-payment-methods', [PaymentMethodController::class, 'index']);
     Route::get('get-product-list-for-barcode', [ProductController::class, 'getProductListForBarcode']);
+    Route::get('get-product-columns', [ProductController::class, 'getProductColumns']);
     Route::get('get-reports', [ReportController::class, 'index']);
 });
